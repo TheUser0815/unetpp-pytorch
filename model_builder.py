@@ -71,7 +71,9 @@ class VGGDecoderBlock(nn.Module):
 
 
 
-class SamplerPair:
+class SamplerPair(nn.Module):
+    def __init__(self):
+        super().__init__()
     def down(self, x):
         return self.downsampler(x)
     def up(self, x):
@@ -80,6 +82,7 @@ class SamplerPair:
 
 class BasicSamplerPair(SamplerPair):
     def __init__(self):
+        super().__init__()
         self.downsampl_fun = nn.MaxPool2d(2)
     def downsampler(self, x):
         self.shape = x.shape[2:]
@@ -142,7 +145,8 @@ class ModelLayer(nn.Module):
             sampler = BasicSamplerPair
         self.sampler = sampler()
 
-        self.elements = [EncoderBlock(layer_data, layer_builder=encoder_layer_builder)]
+        self.elements = nn.ModuleList()
+        self.elements.append(EncoderBlock(layer_data, layer_builder=encoder_layer_builder))
 
         #build decoder blocks of current layer
         for ind in range(layer_number):
